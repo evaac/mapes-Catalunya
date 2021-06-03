@@ -1,13 +1,13 @@
 # mapes-Catalunya
 <p>L'objectiu d'aquest script és compartir un petit tutorial per crear mapes de Catalunya a R amb GGplot.</p>
 <p>És recomanable que tinguis coneixements previs de R, però si no és el cas, igualment et podrà ser útil. </p>
-<p>Per crear els mapes he utilitzat el paquet sf, que permet que tot el procés sigui més senzill i comprensible que altres opcions. La part més complicada ha estat 
-trobar els shapefiles de les províncies, les comarques i els municipis. Els hauràs de descarregar i deixar tots els fitxers en una mateixa carpeta:</p>
+<p>Per crear els mapes he utilitzat el <b>paquet sf</b>, que permet que tot el procés sigui més senzill i comprensible que altres opcions. La part més complicada ha estat 
+  trobar els <b>shapefiles de les províncies, les comarques i els municipis</b>. Els hauràs de descarregar i deixar tots els fitxers en una mateixa carpeta:</p>
 <ul><li> <a href="https://analisi.transparenciacatalunya.cat/en/Urbanisme-infraestructures/L-mits-administratius-provincials-de-Catalunya/ghr8-wp3h" target="_blank">
 Shapefiles de les províncies de Catalunya</a></li>
 <li> <a href="https://www.icgc.cat/Administracio-i-empresa/Descarregues/Capes-de-geoinformacio/Base-municipal">Shapefile dels municipis, comarques i províncies de Catalunya</a></li>
 </ul>
-<p>Comencem carregant els paquets. Ja saps, si no els tens instal·lats, utilitza la primera línia. Si no, passa directament a les següents: </p>
+<p>Comencem carregant els paquets. Ja saps, si no els tens instal·lats, utilitza una estructura com la de la primera línia. Si no, passa directament a les següents: </p>
 <pre>
 install.packages("sf")
 library(sf)
@@ -23,7 +23,8 @@ percent <- function(first, second) {
 }
 </pre>
 <p>
-## Mapa provincial
+
+ ## Mapa provincial
 <p>Creem un dataframe amb el shapefile de les provincies.</p>
 <pre>
 provincies <- st_read("/dades/mapes/provincies-Catalunya/geo_export_418ccb84-c6f7-468b-8dd2-ab8f1b8ae2bb.shp")
@@ -33,7 +34,7 @@ provincies <- st_read("/dades/mapes/provincies-Catalunya/geo_export_418ccb84-c6f
 ggplot(provincies) +
 geom_sf()
 </pre>
-<p>Ara ho compliquem una mica més i afegim el nom de les províncies, així com un tema que esborra les línies de fons.</p>
+<p>Ara ho compliquem una mica més i afegim el nom de les províncies, així com un tema que esborra els quadrants i el fons.</p>
 <pre>
 ggplot(provincies) +
   geom_sf() +
@@ -59,6 +60,7 @@ ggplot(provincies) +
      caption="Font de les dades: ",
      fill="Superfície en m2") 
 </pre>
+
 ## Mapa comarcal
 <p>Per crear un mapa comarcal, el funcionament és similar. L'única diferència és que com el mapa té més detall, trigarà més a carregar.</p>
 <p>De tots els fitxers shapefiles descarregats, el que necessitaràs és el que s'anomena bm5mv21sh0tpc1_20200601_0.shp. </p>
@@ -66,11 +68,11 @@ ggplot(provincies) +
 comarques <- st_read("dades/mapes/comarques-Catalunya/bm5mv21sh0tpc1_20200601_0.shp")
 </pre>
 <p>En l'exemple anterior, hem pintat el mapa en funció d'una variable continguda al mateix dataframe del mapa, però no és l'habitual. Normalmente tindràs un o diversos 
-dataframes amb les dades, i un altre amb els shapefiles. Treballaràs les dades i quan ja les tinguis, fusionaràs el dataframe de les dades i el dels shapefiles. Per fer-ho, necessites que tots dos dataframes comparteixin una columna amb valors idèntics, habitualment el codi comarcal, el codi municipal, etc. (millor un valor numèric, ja que 
+dataframes amb les dades, i un altre amb els shapefiles. Treballaràs les dades i quan ja les tinguis, fusionaràs el dataframe de les dades i el dels shapefiles. Per fer-ho, necessites que tots dos dataframes comparteixin una <b>columna amb valors idèntics</b>, habitualment el codi comarcal, el codi municipal, etc. (millor un valor numèric, ja que 
 els textos admeten més variacions i si els camps no són exactament idèntics, obtindràs valors NA. </p>
 <p>En el meu exemple he treballat amb les xifres de vacunació. He calculat el percentatge de població vacunada amb una dosi i amb la pauta completa, en relació a la població de la comarca. </p>
 <pre>
-df_vacunes <- read_csv("../../dades/vacunacio/Vacunaci__per_al_COVID-19__persones_vacunades_per_comarca.csv", 
+df_vacunes <- read_csv("dades/vacunacio/Vacunaci__per_al_COVID-19__persones_vacunades_per_comarca.csv", 
                        col_types = cols(DATA = col_date(format = "%d/%m/%Y")))
 </pre>
 <p>T'estalvio els passos intermitjos, que pots consultar a l'Script, i vaig directament a com fusionar els dataframes finals. </p>
@@ -96,5 +98,32 @@ ggplot(mapa_vacunes, aes(fill=Perc_1dosi)) +
 municipis <- st_read("dades/mapes/municipis-Catalunya/bm5mv21sh0tpm1_20200601_0.shp")
 </pre>
 <p>Com que els codis municipals d'aquest dataframe tenen un dígit de més, l'eliminem. </p>
-
+<pre>
+municipis$CODIMUN <- str_sub(municipis$CODIMUNI,1,5)
+</pre>
+<p>Si no et sents còmode esborrant valors directament del dataframe, pots crear un altre dataframe i utilitzar "mutate". En el meu exemple, he fet prèviament
+una prova creant una nova columna amb el valor modificat.</p>
+<p>Aquí he treballat amb un dataframe de les dosis de vacunes administrades per municipi, i amb un altre que contenia les dades de població de cada municipi. </p>
+<pre>
+df_vacuna_mun <- read_csv("dades/vacunacio/Vacunaci__per_al_COVID-19__dosis_administrades_per_municipi.csv")
+</pre>
+<pre>
+poblacio_mun <- read_csv("dades/poblacio/Registre_central_de_poblaci__del_CatSalut__poblaci__per_municipi.csv")
+</pre>
+<p>Després d'una fusió i diverses transformacions, he obtingut el dataframe que fusionaré amb el shapefile. </p>
+<pre>
+mapa_mun <- left_join(municipis, vacunes_mun_pob, by=c("CODIMUN"="MUNICIPI_CODI"))
+</pre>
+<p>Ara ja puc pintar el mapa municipal.</p>
+<pre>
+ggplot(mapa_mun, aes(fill=Perc_1dosi)) +
+  geom_sf(color="white", size=.1) +
+  theme_void() +
+  theme(plot.subtitle=element_text(hjust=.3, margin=margin(10,0,10,0))) +
+  scale_fill_viridis(option="mako", direction=-1, 
+                     labels=function(x) paste0(x, "%"), guide=guide_colorsteps(show.limits=TRUE)) +
+  labs(subtitle="Població que ha rebut almenys una dosi",
+       caption="Font: Departament de Salut. Generalitat de Catalunya\nActualitzat: 3/06/2021",
+       fill="") 
+</pre>
 
