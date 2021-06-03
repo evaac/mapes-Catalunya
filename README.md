@@ -27,7 +27,7 @@ percent <- function(first, second) {
  ## Mapa provincial
 <p>Creem un dataframe amb el shapefile de les provincies.</p>
 <pre>
-provincies <- st_read("/dades/mapes/provincies-Catalunya/geo_export_418ccb84-c6f7-468b-8dd2-ab8f1b8ae2bb.shp")
+provincies <- st_read("geo_export_418ccb84-c6f7-468b-8dd2-ab8f1b8ae2bb.shp")
 </pre>
 <p>Dibuixar un mapa en blanc amb els límits de les províncies és tan senzill com: </p>
 <pre>
