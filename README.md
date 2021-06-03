@@ -8,11 +8,18 @@ Shapefiles de les províncies de Catalunya</a></li>
 <li><a href="https://www.icgc.cat/Administracio-i-empresa/Descarregues/Capes-de-geoinformacio/Base-municipal">Shapefile dels municipis, comarques i províncies de Catalunya</a></li>
 </ul>
 <p>Comencem carregant els paquets. Ja saps, si no els tens instal·lats, utilitza la primera línia. Si no, passa directament a les següents: </p>
-``` r
+``` 
 install.packages("sf")
 library(sf)
 library(tidyverse)
 library(readxl)
 library(viridis)
 library(patchwork)
+```
+<p>He utilitzat una funció per calcular els percentatges sobre la població</p>
+```
+percent <- function(first, second) {
+  perc <- round(first / second * 100,1)
+  return (perc)
+}
 ```
